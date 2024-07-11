@@ -8,7 +8,7 @@ declare global {
 export function initBrevoTracker() {
   window.sib = {
     equeue: [],
-    client_key: "45x9ltm5vhwzp7wn8w7ci4r8",
+    client_key: "vu7i2e63qty3kpqwks503mpk",
   };
 
   window.sendinblue = {};
@@ -19,11 +19,11 @@ export function initBrevoTracker() {
   ) {
     (function (k) {
       window.sendinblue[k] = function () {
-        let arg = Array.prototype.slice.call(arguments);
+        var arg = Array.prototype.slice.call(arguments);
         (
           window.sib[k] ||
           function () {
-            let t: any = {};
+            var t: any = {};
             t[k] = arg;
             window.sib.equeue.push(t);
           }
@@ -41,3 +41,5 @@ export function initBrevoTracker() {
   iscript.parentNode?.insertBefore(n, iscript);
   window.sendinblue.page();
 }
+
+export {};

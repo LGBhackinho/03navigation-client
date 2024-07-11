@@ -1,7 +1,13 @@
 // src/pages/Home.tsx
 import React from "react";
+import { useEffect } from "react";
+import { initBrevoTracker } from "../lib/trackerBrevo";
 
 const Home: React.FC = () => {
+  useEffect(() => {
+    initBrevoTracker();
+  }, []);
+
   return (
     <div className="right-side">
       <div className="right-side-page">
