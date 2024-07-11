@@ -6,8 +6,7 @@ type Props = {
   taskRow: ITask;
   deleteTaskInComponentTasks: (id: string) => void;
   updateTaskCheckbox: (taskRow: ITask) => void;
-
-  updateTaskRow: (taskRow: ITask) => void;
+  updateTaskRow: (isModified: boolean, taskRow: ITask) => void;
 };
 
 const TasksRow: React.FC<Props> = (props: Props) => {
@@ -25,8 +24,11 @@ const TasksRow: React.FC<Props> = (props: Props) => {
     props.deleteTaskInComponentTasks(taskRow._id!);
   };
 
-  const updateTaskRow = async () => {
-    props.updateTaskRow(taskRow);
+  const updateTaskRow = async (value: string) => {
+    //aeguments
+    //isModified:boolean
+    //task:Itask
+    props.updateTaskRow(true, taskRow);
   };
 
   return (
@@ -34,6 +36,7 @@ const TasksRow: React.FC<Props> = (props: Props) => {
       <table className="task-row">
         <thead>
           <tr>
+            <th>Priorité</th>
             <th>Done</th>
             <th>Titre</th>
             <th>Description</th>
@@ -44,6 +47,7 @@ const TasksRow: React.FC<Props> = (props: Props) => {
         </thead>
         <tbody>
           <tr>
+            <td>{taskRow.priority}</td>
             <td>
               <input
                 type="checkbox"
@@ -56,7 +60,10 @@ const TasksRow: React.FC<Props> = (props: Props) => {
             <td>{taskRow.description}</td>
             <td>{taskRow.date}</td>
             <td>
-              <button className="btn-blue" onClick={() => updateTaskRow()}>
+              <button
+                className="btn-blue"
+                onClick={() => updateTaskRow("updateRow")}
+              >
                 modifier
               </button>
             </td>

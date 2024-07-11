@@ -1,11 +1,12 @@
 // src/views/Tasks.tsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import TasksRow from "../component/TasksRow";
 import {
   addTask,
   deleteTask,
   fetchTasks,
   updateTaskDone,
+  editTask,
 } from "../services/fetchTasks";
 import ITask from "../interfaces/ITask";
 import TasksFormObject from "../component/TasksFormObject";
@@ -15,19 +16,37 @@ const Tasks: React.FC = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState<string | null>(null);
 
+  ////POUR LE BOUTON MODIFICATION
+  const [isModified, setIsModified] = useState(false);
+  const [taskToPass, setTaskToPass] = useState<ITask>({ title: "", date: "" });
+
   useEffect(() => {
     getAllTasks();
   }, []);
 
   //pour récupérer la liste
-  const getAllTasks = async () => {
+  const getAllTasks = useCallback(async () => {
+    setlistTasks([]);
     let list = await fetchTasks();
-    setlistTasks(list);
-  };
+    setlistTasks([...list]);
+  }, []);
 
-  const addTaskInComponentTask = async (taskToAdd: ITask) => {
-    let task = await addTask(taskToAdd);
-    console.log(task);
+  const addTaskInComponentTasks = async (
+    taskToAdd: ITask,
+    isModifiedValue: boolean
+  ) => {
+    if (isModifiedValue) {
+      //modifier une tâche
+      let task = await editTask(taskToAdd);
+      console.log(task);
+      setIsModified(false);
+    } else {
+      //ajouter une tâche
+      let task = await addTask(taskToAdd);
+      console.log(task);
+      setIsModified(false);
+    }
+    //afficher la liste
     await getAllTasks();
   };
 
@@ -42,10 +61,9 @@ const Tasks: React.FC = () => {
     await getAllTasks();
   };
 
-  const updateTaskRow = async (taskRow: ITask) => {
-    await updateTaskRow(taskRow);
-
-    await getAllTasks();
+  const updateTaskRow = (isModified: boolean, taskRow: ITask) => {
+    setIsModified(isModified);
+    setTaskToPass(taskRow);
   };
 
   const handleDeleteConfirmation = async () => {
@@ -66,13 +84,15 @@ const Tasks: React.FC = () => {
   return (
     <div className="right-side">
       <TasksFormObject
-        addTaskInComponentTask={(taskToAdd: ITask) =>
-          addTaskInComponentTask(taskToAdd)
+        task={taskToPass}
+        isModified={isModified}
+        addTaskInComponentTask={(taskToAdd: ITask, isModified: boolean) =>
+          addTaskInComponentTasks(taskToAdd, isModified)
         }
       />
       {showDeleteModal && (
         <div className="container-valid-delete">
-          <p>Etes-vous sur de vouloir supprimer ?</p>
+          <p>Etes-vous sur de vouloir supprimer {taskToPass.title} ?</p>
           <div className="container-btn-delete">
             <button className="btn-gray" onClick={handleCancelDelete}>
               Annuler
@@ -88,8 +108,10 @@ const Tasks: React.FC = () => {
           <TasksRow
             taskRow={task}
             deleteTaskInComponentTasks={(id: string) => confirmDeleteTask(id)}
-            updateTaskCheckbox={(taskRow) => updateTaskCheckbox(taskRow)}
-            updateTaskRow={(taskRow) => updateTaskRow(taskRow)}
+            updateTaskCheckbox={(taskRow: ITask) => updateTaskCheckbox(taskRow)}
+            updateTaskRow={(isModified: boolean, taskRow: ITask) =>
+              updateTaskRow(isModified, taskRow)
+            }
           />
         </div>
       ))}

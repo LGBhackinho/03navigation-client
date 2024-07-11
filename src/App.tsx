@@ -1,6 +1,6 @@
 // src/App.tsx
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { HashRouter as Router, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Header from "./component/Header";
@@ -8,9 +8,14 @@ import Sidebar from "./component/SideBar";
 import Home from "./pages/Home";
 import Tasks from "./pages/Tasks";
 import About from "./pages/About";
+import { initBrevoTracker } from "./lib/trackerBrevo";
 
 const App: React.FC = () => {
   const [title, setTitle] = useState("");
+
+  useEffect(() => {
+    initBrevoTracker();
+  }, []);
 
   return (
     <div className="container">

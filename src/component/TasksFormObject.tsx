@@ -1,21 +1,59 @@
 // src/views/Tasks.tsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ITask from "../interfaces/ITask";
 
-const TasksFormObject: React.FC<any> = ({ addTaskInComponentTask }) => {
+type Props = {
+  task: ITask;
+  isModified: boolean;
+  addTaskInComponentTask: (taskRow: ITask, isModified: boolean) => void;
+};
+
+const TasksFormObject: React.FC<Props> = (props: Props) => {
   const [descriptionVisibility, setdescriptionVisibility] = useState(
     "descriptionErrorHidden"
   );
   const [titleVisibility, settitleVisibility] = useState("titleErrorHidden");
   const [dateVisibility, setdateVisibility] = useState("dateErrorHidden");
 
-  const [taskForm, setTaskForm] = useState<ITask>({ title: "", date: "" });
+  const [taskForm, setTaskForm] = useState<ITask>({
+    title: "",
+    date: "",
+    priority: "",
+  });
+
+  const [showButtonCreateOrModify, setShowButtonCreateOrModify] = useState("");
+
+  useEffect(() => {
+    //state pour les champs
+    if (!props.isModified) {
+      setTaskForm({
+        title: "",
+        description: "",
+        date: "",
+        done: false,
+        priority: "",
+      });
+      setShowButtonCreateOrModify("Créer");
+    } else {
+      setTaskForm(props.task);
+      setShowButtonCreateOrModify("Modifier");
+    }
+  }, [props.isModified]);
+
+  useEffect(() => {
+    //state pour les champs
+    if (props.isModified) {
+      setTaskForm(props.task);
+      //setShowButtonCreateOrModify("Modifier")
+    }
+  }, [props.task._id]);
 
   enum FormFields {
     StringField,
     TextAreaField,
     DateField,
     CheckBoxField,
+    RodioButtonFiled,
   }
 
   function handleChange<T>(value: T, TypeField: number): void {
@@ -34,6 +72,10 @@ const TasksFormObject: React.FC<any> = ({ addTaskInComponentTask }) => {
     if (TypeField === FormFields.CheckBoxField) {
       // setDone(value as boolean);
       setTaskForm({ ...taskForm, done: value as boolean });
+    }
+    if (TypeField === FormFields.RodioButtonFiled) {
+      // setDone(value as boolean);
+      setTaskForm({ ...taskForm, priority: value as string });
     }
   }
 
@@ -62,7 +104,7 @@ const TasksFormObject: React.FC<any> = ({ addTaskInComponentTask }) => {
     }
 
     if (validate) {
-      addTaskInComponentTask(taskForm);
+      props.addTaskInComponentTask(taskForm, props.isModified);
     }
 
     return validate;
@@ -113,8 +155,50 @@ const TasksFormObject: React.FC<any> = ({ addTaskInComponentTask }) => {
             }
           />
         </div>
+
+        <div className="input-check">
+          <fieldset>
+            <legend>Priorité</legend>
+            <div>
+              <input
+                type="radio"
+                id="oui"
+                name="priority"
+                value="oui"
+                checked={taskForm.priority! === "oui"}
+                onClick={(event) =>
+                  handleChange(
+                    (event.target as HTMLInputElement).value,
+                    FormFields.RodioButtonFiled
+                  )
+                }
+              />
+              <label htmlFor="oui">oui</label>
+
+              <input
+                type="radio"
+                id="non"
+                name="priority"
+                value="non"
+                checked={taskForm.priority! === "non"}
+                onClick={(event) =>
+                  handleChange(
+                    (event.target as HTMLInputElement).value,
+                    FormFields.RodioButtonFiled
+                  )
+                }
+              />
+              <label htmlFor="non">non</label>
+            </div>
+          </fieldset>
+        </div>
+
         <div className="btn-form">
-          <input className="btn-creation" type="submit" value="Création" />
+          <input
+            className="btn-creation"
+            type="submit"
+            value={showButtonCreateOrModify}
+          />
           <input className="btn-annule" type="button" value="Annulé" />
         </div>
       </form>
