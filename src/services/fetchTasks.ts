@@ -1,6 +1,7 @@
 import ITask from "../interfaces/ITask";
 
-const urlServer: string = process.env.REACT_APP_URL_BACKEND as string;
+const urlServer: string = process.env
+  .REACT_APP_URL_BACKEND_PRODUCTION as string;
 
 /////////////////  Récupérer toutes les tâches /
 
